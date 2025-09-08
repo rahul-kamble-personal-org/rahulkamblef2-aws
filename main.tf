@@ -1,39 +1,28 @@
-provider "aws" {
-  region = var.aws_region
-
-  default_tags {
-    tags = var.tags
+terraform {
+  cloud {
+    organization = "rahulkamblef2"
+    workspaces {
+      name = "rahulkamblef2-aws"
+    }
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 }
 
-# Data source to get current AWS account information
+provider "aws" {
+  region = "ap-south-1"
+}
+
 data "aws_caller_identity" "current" {}
 
-# Data source to get current AWS region
-data "aws_region" "current" {}
-
-# Data source to get available availability zones
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-# Data source to get the latest Amazon Linux 2 AMI (free tier eligible)
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+output "debug_info" {
+  value = {
+    account_id = data.aws_caller_identity.current.account_id
+    caller_arn = data.aws_caller_identity.current.arn
+    user_id    = data.aws_caller_identity.current.user_id
   }
 }
